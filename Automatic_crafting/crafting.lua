@@ -11,12 +11,13 @@ meItemList = {
     [4] = {name = "Spruce Planks", id = "minecraft:spruce_planks", amount = 1024}
 }
 
-function addToList(name,id,amount)
-    if not amount then
+function addToList(chestItemName,chestItemId,chestItemAmount)
+    if not chestItemAmount then
         amount = 5000
     end
-    newitem = {name = name,id = id,amount = amount}
-    meItemList.insert(newitem)
+    newitem = {name = chestItemName,id = chestItemId,amount = chestItemAmount}
+
+    table.insert(meItemList, newitem)
 end
 
 local function checkItems(itemID)
@@ -58,23 +59,38 @@ local function calcToCraft(stocked, desired)
     return missing
 end
 
+local function printlist()
+    for i, item in ipairs(meItemList) do
+        print(item.name, item.id, item.amount)
+    end
+end
+
 local function readChest()
-    local chesttable = chest.list()
-    print (chesttable[1])
-    if chesttable then
-        asdads = read()
-        for slot, item in pairs(chesttable) do
-            local itemid = item.name
+    local chestTable = chest.list()
+    print(chestTable[1]) 
+    if chestTable[1] then
+        input = read()
+        if input == "list" then
+            printlist()
+        end
+        for slot, item in pairs(chestTable) do
+            local slotitem = item.name
             local itemcount = 2 ^ item.count
             local name = item.name:match("([^:]+)$")
-            if chekifalreadyinList(itemid) then
-                addToList(name,itemid,itemcount)
+
+            print(slotitem)
+            
+
+            local check = checkIfAlreadyInList(slotitem)
+            if check == true then
+                print(name,slotitem,itemcount)
+                addToList(name,slotitem,itemcount)
             end
         end
     end
 end
 
-local function chekifalreadyinList(id)
+function checkIfAlreadyInList(id)
     for i, part in ipairs(meItemList) do
         if id == part.id then
             return false
