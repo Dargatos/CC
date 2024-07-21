@@ -1,5 +1,6 @@
 local me = peripheral.find("meBridge")
 local monitor = peripheral.find("monitor")
+local chest = peripheral.find("minecraft:chest")
 
 
 
@@ -57,6 +58,31 @@ local function calcToCraft(stocked, desired)
     return missing
 end
 
+local function readChest()
+    local chesttable = chest.list()
+    print (chesttable[1])
+    if chesttable then
+        asdads = read()
+        for slot, item in pairs(chesttable) do
+            local itemid = item.name
+            local itemcount = 2 ^ item.count
+            local name = item.name:match("([^:]+)$")
+            if chekifalreadyinList(itemid) then
+                addToList(name,itemid,itemcount)
+            end
+        end
+    end
+end
+
+local function chekifalreadyinList(id)
+    for i, part in ipairs(meItemList) do
+        if id == part.id then
+            return false
+        end
+    end
+    return true
+end
+
 local function getinfo()
     for i, item in ipairs(meItemList)do
 
@@ -91,6 +117,7 @@ local function main()
 
     -- Main loop of cheking items and crafting if necessary
     while true do
+        readChest()
         getinfo()
         sleep(5)
     end
