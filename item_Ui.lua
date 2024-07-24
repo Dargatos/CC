@@ -32,13 +32,19 @@ local function add_amount_values(item_name, child_value)
 end
 
 local function read_system_values()
-    local items = me.listItems(), me.listGas()
-    if items then
-    else
-        local items = me.listAll()
+    local items
+
+    while true do
+        items = me.listItems()
+        if items then
+            
+            break
+        end
+        print("me didnt retun values")
+        sleep(1)
     end
 
-
+    print(items)
 
     -- Searching for items in "list" and storing value in array
     for _, item_name in ipairs(list) do
