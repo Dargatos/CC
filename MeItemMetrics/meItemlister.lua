@@ -1,7 +1,8 @@
+
 -- Adding peripherals
 local monitor = peripheral.find("monitor")
 local me = peripheral.find("meBridge")
-local screen = "Stats"
+Screen = "Stats"
 
 -- Declaring tables
 local chosenItems = {
@@ -19,15 +20,41 @@ local chosenItems = {
     "malum:eldritch_spirit",
     "mekanism:sodium"
 }
-meStats = {}
-maxData = 700
+
+SettingsButtons = {
+    label = "General Settings",
+    xPos = 1,
+    yPos = 3,
+    kind = "x",
+    buttons = {
+        [1] = {name = "Add/Remove Items"},
+        [2] = {name = "Select Monitor"},
+        [3] = {name = "Graph Settings"},
+        [4] = {name= "Increase Settings"}
+    }
+}
+
+Add_RemoveOptionsList = {
+    xPos = 23,
+    yPos = 5,
+    kind = "itself",
+    buttons={
+        [1] = {name = "Write in terminal"},
+        [2] = {name = "Use chest"},
+        [3] = {name = "<Adding>"},
+        [4] = {name = "Priority",value = 1},
+        [5] = {name = "Use terminal"}
+    }
+}
+MeStats = {}
+MaxData = 700
 local function savetData(meitem)
     -- Checks if there is already a table
     local noTable = true
-    if #meStats == 0 then 
+    if #MeStats == 0 then 
         noTable = true 
     end
-    for i, item in pairs(meStats) do
+    for i, item in pairs(MeStats) do
         if item.name == meitem.name then
             noTable = false
             break
@@ -37,11 +64,11 @@ local function savetData(meitem)
     -- if there is no table create and stores the new one
     if noTable == true then
 
-        table.insert(meStats,{name = meitem.name,stats = {}})
+        table.insert(MeStats,{name = meitem.name,stats = {}})
     end
 
     -- Saves the data in the table
-    for i, entry  in pairs(meStats) do
+    for i, entry  in pairs(MeStats) do
         if entry.name == meitem.name then
             local amount = meitem.amount or 0
             table.insert(entry.stats,1 ,amount)
@@ -67,47 +94,21 @@ local function storeMeStats()
             savetData(item)
         end
 
-        if #meStats > maxData then
-            table.remove(meStats,1)
+        if #MeStats > MaxData then
+            table.remove(MeStats,1)
         end
         print("Stats Saved")
         sleep(1)
     end
 end
 
-local function read_system_values()
-    local items
-
-    while true do
-        items = me.listItems()
-        if items then
-            
-            break
-        end
-        print("me didnt retun values")
-        sleep(1)
-    end
-
-    -- Searching for items in "list" and storing value in array
-    for _, item_name in ipairs(list) do
-        for _, item in pairs(items) do
-            if item.name == item_name then
-                add_amount_values(item_name, item.amount)
-                
-            end
-            
-        end
-        
-    end
-    return true
-end
 
 -- Im bad at remembering so for my brain some copys fo string functions
 -- sixhundred_sec = string.format("%.2f/h", sixhundred_sec)  -- Round to 2 decimal places
 -- sixty_sec = string.format("%.0f/m", sixty_sec)  -- Round to 2 decimal places
 -- ten_sec = string.format("%.2f/s", ten_sec)  -- Round to 2 decimal places
 
-local function formatWithDots(number)
+function FormatWithDots(number)
     -- Convert the number to a string
     local numStr = tostring(number)
 
@@ -142,7 +143,7 @@ local function display_on_monitor()
 
         monitor.write(itemName)
         monitor.setCursorPos(18,i+2)
-        monitor.write(formatWithDots(last_value))
+        monitor.write(FormatWithDots(last_value))
         print(last_value)
 
         local differences = clac_diff(item.name)
@@ -173,19 +174,103 @@ local function display_on_monitor()
     end
 end
 
+local function drawButtonList(monitor,list)
+    local btnDistance = list.btnDistance
+    local label = list.label
+    local xPos = list.xPos
+    local yPos = list.yPos
+    local headcolor = list.headcolor or colors.green
+    local tc = list.textcolor or colors.white
+    local bg = list.backgroundcolor or colors.black
+    local anchor = list.anchor or "right"
+    local yoffset = list.yoffset or 1
+    local kind = list.kind or false
+
+    if not label then
+        yoffset = 0
+    end
+
+    -- calculates longest label
+    if not btnDistance then
+        btnDistance = 0
+        for i, item in pairs(list.buttons) do
+            if #item.name > btnDistance then
+                btnDistance = #item.name
+            end
+        end
+        btnDistance = btnDistance + 1 
+        list["btnDistance"] = btnDistance
+    end
+
+    monitor.setCursorPos(xPos,yPos)
+    monitor.setBackgroundColor(bg)
+    monitor.setTextColor(headcolor)
+
+    if label then 
+        monitor.write(label)
+        yPos = yPos + yoffset
+    else
+        yPos = yPos -1
+    end
+
+    monitor.setTextColor(tc)
+    for i, btn in pairs(list.buttons) do
+
+        if kind == "itself" then
+            monitor.setBackgroundColor(colors.gray)
+        else
+            monitor.setBackgroundColor(bg)
+        end
+
+        monitor.setCursorPos(xPos,yPos + i)
+        monitor.write(btn.name)
+        monitor.setBackgroundColor(colors.green)
+        monitor.setCursorPos(xPos + btnDistance,yPos + i)
+        
+        -- Saves position of placed button in list.
+        list.buttons[i]["x"] = xPos + btnDistance
+        list.buttons[i]["y"] = yPos + i
+        
+        if kind == "x" then
+            monitor.write("x")
+        elseif kind == "o" then
+            monitor.write("o")
+        elseif not kind then
+            monitor.write(" ")
+        end
+    end
+end
+
 local function getIndexofItem(choosen)
-    for i, meItem in pairs(meStats) do
+    for i, meItem in pairs(MeStats) do
         if choosen == meItem.name then
             return i
         end
     end
     return false
 end
+local function displaySettingsWindow()
+    monitor.setBackgroundColor(colors.black)
+    monitor.clear()
+    monitor.setCursorPos((Width / 2) - 4, 1)
+    monitor.write("Settings")
 
-local function drawItemData(x,y,textcolor,switch,bg1,bg2,displayIncrease,choosenitem,storedOffst,increaseOffset)
+    -- Just a button for Debug
+    monitor.setCursorPos(Width,Height)
+    monitor.setBackgroundColor(colors.blue)
+    monitor.write(" ")
+
+    drawButtonList(monitor,SettingsButtons)
+    
+
+    --monitor.write("place items to add or remove in chest !")
+end
+local function drawItemData(x,y,textcolor,switch,bg1,bg2,displayIncrease,choosenitem,storedOffset,increaseOffset)
     local storedOffset = storedOffset or 19
     local increaseOffset = increaseOffset or 11
     local increaseOffset = increaseOffset + storedOffset
+    local indexofItem = getIndexofItem(choosenitem)
+
     monitor.setCursorPos(x,y)
     monitor.setTextColor(textcolor)
 
@@ -201,15 +286,15 @@ local function drawItemData(x,y,textcolor,switch,bg1,bg2,displayIncrease,choosen
     -- Draw name
     local _, _, itemName = string.find(choosenitem, ":(.*)")
     monitor.write(itemName)
-    monitor.write(string.rep(" ",width))
+    monitor.write(string.rep(" ",Width))
 
 
     -- Draw Stored amount
-    indexofItem = getIndexofItem(choosenitem)
+    
 
     monitor.setCursorPos(x + storedOffset,y)
     if not indexofItem  == false then
-        monitor.write(meStats[indexofItem].stats[1])
+        monitor.write(MeStats[indexofItem].stats[1])
         
     else
         monitor.write("0")
@@ -225,34 +310,47 @@ local function drawItemData(x,y,textcolor,switch,bg1,bg2,displayIncrease,choosen
 
     if not indexofItem  == false then
         if displayIncrease then
-            if meStats[indexofItem].stats[10] then
-                increase = (meStats[indexofItem].stats[1] - meStats[indexofItem].stats[10]) / 10
-                monitor.write(increase)
+            if MeStats[indexofItem].stats[10] then
+                local increase = (MeStats[indexofItem].stats[1] - MeStats[indexofItem].stats[10]) / 10
+                print(increase)
+                if increase >= 0 then
+                    monitor.write(" "..increase)
+                else
+                   monitor.write(increase)
+                end
             else
-                monitor.write("Wait")
+                monitor.write(" ".."Wait")
             end
             monitor.setCursorPos(x + increaseOffset + 7, y)
-            if meStats[indexofItem].stats[60] then
-                increase = (meStats[indexofItem].stats[1] - meStats[indexofItem].stats[60]) / 60
-                monitor.write(increase)
+            if MeStats[indexofItem].stats[60] then
+                local increase = (MeStats[indexofItem].stats[1] - MeStats[indexofItem].stats[60]) / 60
+                if increase >= 0 then
+                    monitor.write(" "..increase)
+                else
+                   monitor.write(increase)
+                end
             else
-                monitor.write("Wait")
+                monitor.write(" ".."Wait")
             end
             monitor.setCursorPos(x + increaseOffset + 14, y)
-            if meStats[indexofItem].stats[600] then
-                increase = (meStats[indexofItem].stats[1] - meStats[indexofItem].stats[600]) / 600
-                monitor.write(increase)
+            if MeStats[indexofItem].stats[600] then
+                local increase = (MeStats[indexofItem].stats[1] - MeStats[indexofItem].stats[600]) / 600
+                if increase >= 0 then
+                    monitor.write(" "..increase)
+                else
+                   monitor.write(increase)
+                end
             else
-                monitor.write("Wait")
+                monitor.write(" ".."Wait")
             end
         end
     else
-        monitor.write("Wait   Wait   Wait")
+        monitor.write(" Wait   Wait   Wait")
     end
 end
 
 local function getMonitorSize()
-    monX , monY = monitor.getSize()
+    local monX , monY = monitor.getSize()
     return monX, monY
 end
 
@@ -261,37 +359,79 @@ local function tracker()
 end
 
 local function touchHandler()
-    local event, side, x, y = os.pullEvent("monitor_touch")
+    while true do
+        local event, side, x, y = os.pullEvent("monitor_touch")
+        print(x,y)
+        
+        print(Screen)
+        if Screen == "Settings" then
+            -- Just for Debug purpose
+            if x == Width and y == Height then
+                print (SettingsButtons.buttons[4].y)
+            end
+            
+            -- Checks if input is at the x Value of the buttons of the list
+            if x == SettingsButtons.btnDistance + SettingsButtons.xPos then
+
+                if y == SettingsButtons.buttons[1].y then
+                    --Draw new list of Buttons
+                    drawButtonList(monitor,Add_RemoveOptionsList)
+                end
+                if y == SettingsButtons.buttons[2].y then
+
+                end
+                if y == SettingsButtons.buttons[3].y then
+                    
+                end
+                if y == SettingsButtons.buttons[4].y then
+                    
+                end
+            end
+        end
+        if x == Width and y == 1 then
+            Screen = "Settings"
+        end
+    end
 end
 
-local function diplayStats()
-    while true do
-        width, height = getMonitorSize()
-        monitor.setBackgroundColor(colors.black)
-        monitor.setTextColor(colors.white)
-        monitor.setCursorPos(width/2 - 14,1)
-        monitor.write("Items stats of the Me System")
-        monitor.setPaletteColor(colors.black,0x000000)
-        monitor.setPaletteColor(colors.gray,0x0b0b0b)
-        local lastData = meStats[#meStats]
+local function diplayStats()    
+    monitor.setBackgroundColor(colors.black)
+    monitor.setTextColor(colors.white)
+    monitor.setCursorPos(Width/2 - 14,1)
+    monitor.write("Items stats of the Me System")
+    monitor.setPaletteColor(colors.black,0x000000)
+    monitor.setPaletteColor(colors.gray,0x0b0b0b)
 
-        for i, name in pairs(chosenItems) do
-            drawItemData(1,3 + i,colors.white,true,colors.black,colors.gray,true,name)
-        end
-        sleep(1) -- Start the function every second instead 
-                --of after every sencond to be more percise and not hardware thingy
+    for i, name in pairs(chosenItems) do
+        drawItemData(1,3 + i,colors.white,true,colors.black,colors.gray,true,name)
     end
+end
 
+local function displayWindow()
+    local displayed = false
+    while true do
+        if Screen == "Stats" then
+            diplayStats()
+            displayed = false
+        elseif Screen == "Settings"  and displayed == false then
+            displaySettingsWindow()
+            displayed = true
+        end
+        sleep(1)-- Start the function every second instead 
+        --of after every sencond to be more percise and not hardware thingy
+    end
+    
 end
 
 local function startMonitor()
-    screen = "Stats"
+    Screen = "Stats"
+    Width, Height = getMonitorSize()
     monitor.clear()
 end
 
 local function main()
     startMonitor()
-    parallel.waitForAny(storeMeStats, diplayStats)
+    parallel.waitForAny(storeMeStats, displayWindow,touchHandler)
 end
 
 main()

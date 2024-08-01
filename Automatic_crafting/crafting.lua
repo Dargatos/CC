@@ -4,7 +4,7 @@ local chest = peripheral.find("minecraft:chest")
 local diskdrive = peripheral.find("drive")
 
 --List of all items that get crafted automatically
-meItemList = { 
+MeItemList = { 
     [1] = {name = "SteelIngots", id = "mekanism:ingot_steel", amount = 5000},
     [2] = {name = "Atomic Alloy", id = "mekanism:alloy_atomic", amount = 1000},
     [3] = {name = "inductionCell", id = "mekanism:ultimate_induction_cell",amount = 5},
@@ -17,16 +17,16 @@ function ToList(chestItemName,chestItemId,chestItemAmount,action)
         return
     end
 
-    newitem = {name = chestItemName,id = chestItemId,amount = chestItemAmount}
+    local newitem = {name = chestItemName,id = chestItemId,amount = chestItemAmount}
 
     if action == "add" then
-        table.insert(meItemList, newitem)
+        table.insert(MeItemList, newitem)
 
     elseif action == "remove" then
         --removes item form List
-        for i, item in pairs(meItemList) do
+        for i, item in pairs(MeItemList) do
             if item.id == chestItemId then
-                table.remove(meItemList, i)
+                table.remove(MeItemList, i)
                 break
             end
         end
@@ -55,7 +55,7 @@ end
 
 local function craftItems(ItemID, value)
     ItemToCraft = {name = ItemID,count = value}
-    crafting, err = me.craftItem(ItemToCraft)
+    local crafting, err = me.craftItem(ItemToCraft)
     return crafting, err
 end
 
@@ -66,7 +66,7 @@ end
 
 local function printlist()
     print("Items in list currently are :")
-    for i, item in ipairs(meItemList) do
+    for i, item in ipairs(MeItemList) do
         print(item.name, item.id, item.amount)
     end
 end
@@ -79,7 +79,7 @@ local function readChest()
         if input == "list" then
             printlist()
         elseif input == "save" then
-            saveListtoDrive()
+            SaveListtoDrive()
         end
 
 
@@ -89,7 +89,7 @@ local function readChest()
             local itemcount = 2 ^ item.count
             local name = item.name:match("([^:]+)$")
 
-            local check = checkIfAlreadyInList(slotitem)
+            local check = CheckIfAlreadyInList(slotitem)
 
             if check == true and input == "remove" then
                 print("removing: " .. slotitem)
@@ -102,8 +102,8 @@ local function readChest()
     end
 end
 
-function checkIfAlreadyInList(id)
-    for i, part in ipairs(meItemList) do
+function CheckIfAlreadyInList(id)
+    for i, part in ipairs(MeItemList) do
         if id == part.id then
             print("Item already in Me")
             return true
@@ -113,15 +113,14 @@ function checkIfAlreadyInList(id)
 end
 
 local function getinfo()
-    for i, item in ipairs(meItemList)do
+    for i, item in ipairs(MeItemList)do
 
         local name = item.name
         local id = item.id
         local amount = item.amount
-        local craftable
         local toCraft
 
-        stockedItems, isCrafting, craftable = checkItems(id)
+        local stockedItems, isCrafting, craftable = checkItems(id)
         toCraft = calcToCraft(stockedItems,amount)
         
         if not craftable then 
@@ -129,7 +128,7 @@ local function getinfo()
         elseif not isCrafting and toCraft > 0 then
             -- Start a crating Job
             
-            getscrafted, craftingError = craftItems(id,toCraft)
+            local getscrafted, craftingError = craftItems(id,toCraft)
             
             if getscrafted then
                 print("Started crafting some tasty " .. name .. " " .. toCraft .. " pieces")
@@ -150,14 +149,14 @@ local function prepareMonitor()
 
 end
 
-function saveListtoDrive()
+function SaveListtoDrive()
     print("Started saving to Disk")
     print(diskdrive.isDiskPresent())
     if not diskdrive.isDiskPresent() then
         printError("no disk check your diskdrive")
         return
     end
-    local seriTable = textutils.serialize(meItemList)
+    local seriTable = textutils.serialize(MeItemList)
     local diskPath = diskdrive.getMountPath(diskdrive)
     local filePath = diskPath .. "/autocraftingslist.txt"
     local file = fs.open(filePath, "w")
@@ -170,7 +169,7 @@ function saveListtoDrive()
     
 end
 
-local function main()
+function Main()
     printlist()
     print(" ")
     term.setTextColor(colors.blue)
@@ -184,4 +183,4 @@ local function main()
     end
 end
 
-main()
+Main()

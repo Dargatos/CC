@@ -49,7 +49,7 @@ local function getModemSide()
     end
 end
 
-function search_items()
+function Search_items()
     for i = 1,16 do
         local item = turtle.getItemDetail(i)
         if item then
@@ -97,7 +97,7 @@ local function getFuel()
 end
 
 local function checkItems()
-    search_items()
+    Search_items()
     
     for i , item in ipairs(necessaryitems) do
         if get_slot_position(item) == "None" then
@@ -110,9 +110,9 @@ local function checkItems()
     
 end
 
-function placing_all_blocks()
+function Placing_all_blocks(stat_proto)
     rednet.send(13,"Building miner",stat_proto)
-    search_items()
+    Search_items()
     local miner = get_slot_position("mekanism:digital_miner")
     local logistical = get_slot_position("mekanism:elite_logistical_transporter")
     local ender_storage = get_slot_position("enderstorage:ender_chest")
@@ -171,14 +171,14 @@ function start_miner()
 end
 
 
-function main()
+function Main()
     getFuel()
     while true do
-        check =  checkItems()
+        local check =  checkItems()
         if check ==  true then
             break
         end
-        agfaf = read()
+        local agfaf = read()
     end
     local whitlist_protocol = "Digital_miner_builder"
     local channelId = peripheral.call("top", "getID")
@@ -205,7 +205,7 @@ function main()
     for i = 1, Repetitions do
         
         if firstStart == false then
-            print(channelID)
+            print(channelId)
             rednet.send(13,string.format("moving to next position",whitlist_protocol),stat_proto)
             rednet.send(channelId,"move",whitlist_protocol)
 
@@ -215,7 +215,7 @@ function main()
         end
         firstStart = false
 
-        placing_all_blocks() --Places miner
+        Placing_all_blocks(stat_proto) --Places miner
         while true do
             local to_mine = peripheral.call("top","getToMine")
             rednet.send(13,string.format("Blocks left to mine %d",to_mine),stat_proto)
@@ -240,7 +240,7 @@ print("type start to start")
 while true do
     local input = read()
     if input == "start" then
-        main()
+        Main()
         break
     else
         print("thats not start")
