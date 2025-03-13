@@ -1,8 +1,8 @@
-
+ 
 local slot_positions = {} -- list of all item found in inv (position in table relates to inv position)
 local necessaryitems = {"mekanism:digital_miner",
 "mekanism:elite_logistical_transporter",
-"enderstorage:ender_chest",
+"enderchests:ender_chest",
 "fluxnetworks:flux_point"}
 local modemSide
 
