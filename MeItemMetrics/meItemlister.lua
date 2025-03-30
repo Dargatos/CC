@@ -431,7 +431,7 @@ end
 
 local function main()
     startMonitor()
-    parallel.waitForAny(storeMeStats, displayWindow,touchHandler)
+    parallel.waitForAny(storeMeStats, displayWindow, touchHandler)
 end
 
 main()
