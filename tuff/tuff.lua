@@ -1,4 +1,4 @@
-package.path = package.path .. ";../tuff/components/?.lua"
+package.path = package.path .. ";./tuff/components/?.lua"
 local Frame = require("frame")
 local Touch_handler = require("touch_handler")
 
