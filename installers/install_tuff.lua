@@ -1,7 +1,7 @@
 local githubUser = "Dargatos"  -- Change to your GitHub username
 local githubRepo = "CC"  -- Change to your repository name
 local branch = "main"        -- Change if using a different branch
-local baseURL = "https://api.github.com/repos/" .. githubUser .. "/" .. githubRepo .. "/contents/lib?ref=" .. branch
+local baseURL = "https://api.github.com/repos/" .. githubUser .. "/" .. githubRepo .. "/contents/tuff?ref=" .. branch
 
 local function downloadFile(path, downloadURL)
     local filePath = "tuff/" .. path:gsub("^tuff/", "") -- Keep correct structure
