@@ -17,6 +17,7 @@ function List:new(values)
     obj.selectedRow = nil  -- Currently selected row
     obj.columnWidths = {} -- Stores the width of each column dynamically
     obj.altcolor = values.altcolor or colors.gray
+    obj.onSelect = values.onSelect or nil  -- Callback function for selection
     obj:calculateColumnWidths() -- Calculate column widths dynamically
 
     return obj
@@ -114,8 +115,6 @@ function List:updateCell(row, col, newValue)
 end
 
 function List:isInside(px, py)
-    print("from", self.xPos, "-", self.xPos + self.width)
-    print("from", self.yPos, "-", self.yPos + self.height)
     return px >= self.xPos and px <= self.xPos + self.width
        and py >= self.yPos and py <= self.yPos + self.height
 end
@@ -123,20 +122,24 @@ end
 function List:selectRow(px, py)
     if not self:isInside(px, py) then return end
 
-    -- Convert mouse click to row index (excluding headers)
     local row = py - self.yPos
     if row > 0 and row <= #self.items then
         self.selectedRow = row
         self:draw()  -- Update display
+
+        -- Trigger the onSelect callback if provided
+        if self.onSelect then
+            local selectedItem = self.items[row]
+            self.onSelect(selectedItem, row)  -- Pass the selected item and row index
+        end
     end
 end
 
 function List:handleTouch(x, y)
-    
     local rowIndex = y - self.yPos  -- Adjust for list position
 
     if rowIndex >= 1 and rowIndex <= #self.items then
-        print("touch")
+        print("List touch")
         self.selectedRow = rowIndex
         self:draw()  -- Redraw to highlight selected row
 
@@ -144,7 +147,14 @@ function List:handleTouch(x, y)
         if type(self.items[rowIndex]) == "table" and self.items[rowIndex].command then
             self.items[rowIndex].command()
         end
+
+        -- Trigger the onSelect callback if provided
+        if self.onSelect then
+            local selectedItem = self.items[rowIndex]
+            self.onSelect(selectedItem, rowIndex)  -- Pass the selected item and row index
+        end
     end
 end
+
 
 return List

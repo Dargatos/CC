@@ -25,6 +25,8 @@ function Button:new(values)
         obj[k] = v
     end
 
+    obj.height = values.height or 3
+    obj.width = math.max(values.width or 3, #values.text + 2)
     obj.isActive = false
     obj.zIndex = obj.zIndex or 0
 
