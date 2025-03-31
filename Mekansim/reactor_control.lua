@@ -1,5 +1,5 @@
 package.path = "../../?.lua;../../?/init.lua;" .. package.path
-package.path = package.path .. ";../lib/?.lua"
+package.path = package.path .. ";./tuff/?.lua"
 
 local telem = require("telem")
 local tuff = require("tuff")
@@ -16,7 +16,7 @@ local mainFrame = tuff.Frame({
 
 
 local label = mainFrame:addComponent({
-    type = "Label",
+    type = "label",
     xPos = 10,
     yPos = 1,
     monitor = mainMonitor,
@@ -25,7 +25,7 @@ local label = mainFrame:addComponent({
 })
 
 local selftart_btn  = mainFrame:addComponent({
-    type = "Button",
+    type = "button",
     xPos = 2,
     yPos = 3,
     monitor = mainMonitor,
@@ -35,7 +35,7 @@ local selftart_btn  = mainFrame:addComponent({
 })
 
 local scram_btn  = mainFrame:addComponent({
-    type = "Button",
+    type = "button",
     xPos = 12,
     yPos = 3,
     monitor = mainMonitor,
@@ -45,7 +45,7 @@ local scram_btn  = mainFrame:addComponent({
 })
 
 local fuel_label  = mainFrame:addComponent({
-    type = "Label",
+    type = "label",
     xPos = 2,
     yPos = 7,
     monitor = mainMonitor,
@@ -54,7 +54,7 @@ local fuel_label  = mainFrame:addComponent({
 })
 
 local fuel_rate  = mainFrame:addComponent({
-    type = "Label",
+    type = "label",
     xPos = 13,
     yPos = 7,
     monitor = mainMonitor,
@@ -63,7 +63,7 @@ local fuel_rate  = mainFrame:addComponent({
 })
 
 local inc100_btn  = mainFrame:addComponent({
-    type = "Button",
+    type = "button",
     xPos = 2,
     yPos = 8,
     monitor = mainMonitor,
@@ -74,7 +74,7 @@ local inc100_btn  = mainFrame:addComponent({
 })
 
 local dec100_btn  = mainFrame:addComponent({
-    type = "Button",
+    type = "button",
     xPos = 14,
     yPos = 8,
     monitor = mainMonitor,
@@ -85,7 +85,7 @@ local dec100_btn  = mainFrame:addComponent({
 })
 
 local inc10_btn  = mainFrame:addComponent({
-    type = "Button",
+    type = "button",
     xPos = 2,
     yPos = 11,
     monitor = mainMonitor,
@@ -96,7 +96,7 @@ local inc10_btn  = mainFrame:addComponent({
 })
 
 local dec10_btn  = mainFrame:addComponent({
-    type = "Button",
+    type = "button",
     xPos = 14,
     yPos = 11,
     monitor = mainMonitor,
