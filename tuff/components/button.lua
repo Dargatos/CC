@@ -6,7 +6,7 @@ function Button:draw()
     local mon = self.parent and self.parent.monitor or self.monitor -- sets Monitor to parent monitor when it has a parent otherwise just the set monitor
 
     mon.setCursorPos(self.xPos, self.yPos)
-    mon.setBackgroundColor(self.bg or colors.gray)
+    mon.setBackgroundColor(self.bgColor or colors.gray)
     width = math.max(self.width or 3, #self.text or 0)
     for i = 0, self.height - 1 or 1 do
         mon.setCursorPos(self.xPos, self.yPos + i)
@@ -29,8 +29,19 @@ function Button:new(values)
     obj.width = math.max(values.width or 3, #values.text + 2)
     obj.isActive = false
     obj.zIndex = obj.zIndex or 0
-
+    obj.autoUpdate = values.autoUpdate or true
     return obj
+end
+
+function Button:update(values)
+    -- Access the current object, which is already 'self'
+    for k, v in pairs(values) do
+        self[k] = v  -- Update the values of the current object
+    end
+    if self.autoUpadte == true then
+        self:draw()
+    end
+    return self  -- Return the updated object (useful for method chaining)
 end
 
 function Button:isInside(px, py)

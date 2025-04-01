@@ -1,4 +1,5 @@
-package.path = package.path .. ";./tuff/components/?.lua"
+--package.path = package.path .. ";./tuff/components/?.lua"
+package.path = ";./tuff/components/?.lua" .. package.path
 local Frame = require("frame")
 local Touch_handler = require("touch_handler")
 
@@ -30,7 +31,7 @@ end
 function tuff.touch()
     while true do
         local event, side, x, y = os.pullEvent("monitor_touch")
-        print("Touched at:", x, y, "on", side)
+        --print("Touched at:", x, y, "on", side)
 
         for _, frame in ipairs(tuff.frames) do 
             for _, child in ipairs(frame.children) do
