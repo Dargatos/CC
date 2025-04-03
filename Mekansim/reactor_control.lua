@@ -307,6 +307,19 @@ local coolantback = telem.backplane()
 
 coolantback:addOutput('coolantMon', telem.output.plotter.line(collantwin, 'coolant', colors.black, colors.white, nil, 0, 1.1))
 
+local grafanabackplane = telem.backplane()
+
+local authGrafana2 = {
+    endpoint = 'http://localhost:3003/telegraf',
+    apiKey = ""
+}
+
+grafanabackplane:addInput('fission', telem.input.mekanism.fissionReactor('fissionReactorLogicAdapter_0'))
+--grafanabackplane:addInput('Mesys', telem.input.itemStorage('meBridge_0'))
+grafanabackplane:addInput('turbine', telem.input.mekanism.industrialTurbine('turbineValve_0'))
+grafanabackplane:addInput('turbine1', telem.input.mekanism.industrialTurbine('turbineValve_1'))
+grafanabackplane:addInput('turbine2', telem.input.mekanism.industrialTurbine('turbineValve_2'))
+grafanabackplane:addOutput('grafana', telem.output.grafana(authGrafana2.endpoint, authGrafana2.apiKey))
 function update_temp()
     while true do
         reactor_collant = peripheral.call(reactorport, "getCoolantFilledPercentage")
@@ -321,6 +334,7 @@ function update_temp()
             -- Simulate with the selected item amount
             return { coolant = reactor_collant}
         end)
+        
         
         coolantback:addInput('coolantPerc', coolantInput)
         backplane:addInput('reactemp', tempInput)
@@ -343,7 +357,7 @@ end
 
 local function main()
     startup()
-    parallel.waitForAny(tuffRender, tuffTouch, update_temp, backplane:cycleEvery(1),coolantback:cycleEvery(1),check)
+    parallel.waitForAny(tuffRender, tuffTouch, update_temp, backplane:cycleEvery(1),coolantback:cycleEvery(1),check, grafanabackplane:cycleEvery(1))
 end
 
 main()
